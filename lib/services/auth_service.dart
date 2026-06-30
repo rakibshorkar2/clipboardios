@@ -6,22 +6,23 @@ part 'auth_service.g.dart';
 
 @riverpod
 class AuthService extends _$AuthService {
-  late final GoogleSignIn _googleSignIn;
+  late GoogleSignIn _googleSignIn;
 
   @override
   FutureOr<GoogleSignInAccount?> build() async {
     _googleSignIn = GoogleSignIn(
-      scopes: [
+      scopes: <String>[
         drive.DriveApi.driveAppdataScope,
       ],
     );
-    return _googleSignIn.signInSilently();
+    // Use the getter/method compatible with the current version
+    return await _googleSignIn.signInSilently();
   }
 
   Future<GoogleSignInAccount?> signIn() async {
     state = const AsyncValue.loading();
     try {
-      final user = await _googleSignIn.signIn();
+      final GoogleSignInAccount? user = await _googleSignIn.signIn();
       state = AsyncValue.data(user);
       return user;
     } catch (e, st) {
