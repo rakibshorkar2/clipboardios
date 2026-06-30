@@ -24,19 +24,38 @@ jobs:
     - name: Build Runner
       run: dart run build_runner build --delete-conflicting-outputs
       
-    - name: Build iOS (Simulator)
+    - name: Prepare Unsigned Device Build
       run: |
-        # Building for simulator avoids the mandatory code signing check on CI
-        flutter build ios --simulator --release
+        # Change to Manual Signing and add a dummy Development Team to satisfy Xcode's validation
+        sed -i '' 's/ProvisioningStyle = Automatic;/ProvisioningStyle = Manual;/g' ios/Runner.xcodeproj/project.pbxproj
+        sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' ios/Runner.xcodeproj/project.pbxproj
+        
+        # Inject dummy DEVELOPMENT_TEAM and disable code signing
+        sed -i '' '/PRODUCT_BUNDLE_IDENTIFIER/a \
+        DEVELOPMENT_TEAM = ABC1234567; \
+        CODE_SIGNING_REQUIRED = NO; \
+        CODE_SIGNING_ALLOWED = NO; \
+        CODE_SIGN_IDENTITY = "";' ios/Runner.xcodeproj/project.pbxproj
+        
+        # Also update xcconfig
+        echo "DEVELOPMENT_TEAM=ABC1234567" >> ios/Flutter/Generated.xcconfig
+        echo "CODE_SIGNING_REQUIRED=NO" >> ios/Flutter/Generated.xcconfig
+        echo "CODE_SIGNING_ALLOWED=NO" >> ios/Flutter/Generated.xcconfig
+        echo "CODE_SIGN_IDENTITY=" >> ios/Flutter/Generated.xcconfig
+
+    - name: Build iOS (Device)
+      run: |
+        # Build for physical device (ARM64) without signing
+        flutter build ios --release --no-codesign
       
     - name: Create IPA
       run: |
         mkdir -p Payload
-        cp -r build/ios/iphonesimulator/Runner.app Payload/
+        cp -r build/ios/iphoneos/Runner.app Payload/
         zip -r ClipVault.ipa Payload
         
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: clipvault-ipa
+        name: clipvault-ipa-device
         path: ClipVault.ipa
