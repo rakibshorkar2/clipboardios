@@ -1,0 +1,25 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'sync_service.dart';
+
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+String _$syncServiceHash() => r'db7a4d1c3e9c85e0b4ec3c3b02b2ca36f2e72c66';
+
+/// See also [SyncService].
+@ProviderFor(SyncService)
+final syncServiceProvider =
+    AutoDisposeAsyncNotifierProvider<SyncService, void>.internal(
+  SyncService.new,
+  name: r'syncServiceProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$syncServiceHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$SyncService = AutoDisposeAsyncNotifier<void>;
+// ignore_for_file: type=lint
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

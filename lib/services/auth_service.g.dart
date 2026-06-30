@@ -6,7 +6,7 @@ part of 'auth_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$authServiceHash() => r'c9f93a87024b1863c346074d8065b60254720ba5';
+String _$authServiceHash() => r'8f09a42aa32b167e667a4413aa8c61ce8119864a';
 
 /// See also [AuthService].
 @ProviderFor(AuthService)

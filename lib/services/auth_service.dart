@@ -6,25 +6,41 @@ part 'auth_service.g.dart';
 
 @riverpod
 class AuthService extends _$AuthService {
-  late GoogleSignIn _googleSignIn;
+  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
 
   @override
   FutureOr<GoogleSignInAccount?> build() async {
-    _googleSignIn = GoogleSignIn(
-      scopes: <String>[
-        drive.DriveApi.driveAppdataScope,
-      ],
-    );
-    // Use the getter/method compatible with the current version
-    return await _googleSignIn.signInSilently();
+    // Mandatory initialization for v7.2.0+
+    await _googleSignIn.initialize();
+
+    _googleSignIn.authenticationEvents.listen((event) {
+      if (event is GoogleSignInAuthenticationEventSignIn) {
+        state = AsyncValue.data(event.user);
+      } else if (event is GoogleSignInAuthenticationEventSignOut) {
+        state = const AsyncValue.data(null);
+      }
+    }, onError: (e, st) {
+      state = AsyncValue.error(e, st);
+    });
+
+    try {
+      return await _googleSignIn.attemptLightweightAuthentication();
+    } catch (_) {
+      return null;
+    }
   }
 
   Future<GoogleSignInAccount?> signIn() async {
     state = const AsyncValue.loading();
     try {
-      final GoogleSignInAccount? user = await _googleSignIn.signIn();
-      state = AsyncValue.data(user);
-      return user;
+      final result = await _googleSignIn.authenticate(
+        scopeHint: [drive.DriveApi.driveAppdataScope],
+      );
+      
+      // authenticate() returns the account directly in some cases or we get it via event
+      // Based on docs, authenticate() returns the account if successful.
+      state = AsyncValue.data(result);
+      return result;
     } catch (e, st) {
       state = AsyncValue.error(e, st);
       return null;
