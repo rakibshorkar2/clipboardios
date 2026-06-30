@@ -987,6 +987,201 @@ class TagsCompanion extends UpdateCompanion<Tag> {
   }
 }
 
+class $ItemTagsTable extends ItemTags with TableInfo<$ItemTagsTable, ItemTag> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ItemTagsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _itemIdMeta = const VerificationMeta('itemId');
+  @override
+  late final GeneratedColumn<int> itemId = GeneratedColumn<int>(
+      'item_id', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES clipboard_items (id)'));
+  static const VerificationMeta _tagIdMeta = const VerificationMeta('tagId');
+  @override
+  late final GeneratedColumn<int> tagId = GeneratedColumn<int>(
+      'tag_id', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: true,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('REFERENCES tags (id)'));
+  @override
+  List<GeneratedColumn> get $columns => [itemId, tagId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'item_tags';
+  @override
+  VerificationContext validateIntegrity(Insertable<ItemTag> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('item_id')) {
+      context.handle(_itemIdMeta,
+          itemId.isAcceptableOrUnknown(data['item_id']!, _itemIdMeta));
+    } else if (isInserting) {
+      context.missing(_itemIdMeta);
+    }
+    if (data.containsKey('tag_id')) {
+      context.handle(
+          _tagIdMeta, tagId.isAcceptableOrUnknown(data['tag_id']!, _tagIdMeta));
+    } else if (isInserting) {
+      context.missing(_tagIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {itemId, tagId};
+  @override
+  ItemTag map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ItemTag(
+      itemId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}item_id'])!,
+      tagId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}tag_id'])!,
+    );
+  }
+
+  @override
+  $ItemTagsTable createAlias(String alias) {
+    return $ItemTagsTable(attachedDatabase, alias);
+  }
+}
+
+class ItemTag extends DataClass implements Insertable<ItemTag> {
+  final int itemId;
+  final int tagId;
+  const ItemTag({required this.itemId, required this.tagId});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['item_id'] = Variable<int>(itemId);
+    map['tag_id'] = Variable<int>(tagId);
+    return map;
+  }
+
+  ItemTagsCompanion toCompanion(bool nullToAbsent) {
+    return ItemTagsCompanion(
+      itemId: Value(itemId),
+      tagId: Value(tagId),
+    );
+  }
+
+  factory ItemTag.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ItemTag(
+      itemId: serializer.fromJson<int>(json['itemId']),
+      tagId: serializer.fromJson<int>(json['tagId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'itemId': serializer.toJson<int>(itemId),
+      'tagId': serializer.toJson<int>(tagId),
+    };
+  }
+
+  ItemTag copyWith({int? itemId, int? tagId}) => ItemTag(
+        itemId: itemId ?? this.itemId,
+        tagId: tagId ?? this.tagId,
+      );
+  ItemTag copyWithCompanion(ItemTagsCompanion data) {
+    return ItemTag(
+      itemId: data.itemId.present ? data.itemId.value : this.itemId,
+      tagId: data.tagId.present ? data.tagId.value : this.tagId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ItemTag(')
+          ..write('itemId: $itemId, ')
+          ..write('tagId: $tagId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(itemId, tagId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ItemTag &&
+          other.itemId == this.itemId &&
+          other.tagId == this.tagId);
+}
+
+class ItemTagsCompanion extends UpdateCompanion<ItemTag> {
+  final Value<int> itemId;
+  final Value<int> tagId;
+  final Value<int> rowid;
+  const ItemTagsCompanion({
+    this.itemId = const Value.absent(),
+    this.tagId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ItemTagsCompanion.insert({
+    required int itemId,
+    required int tagId,
+    this.rowid = const Value.absent(),
+  })  : itemId = Value(itemId),
+        tagId = Value(tagId);
+  static Insertable<ItemTag> custom({
+    Expression<int>? itemId,
+    Expression<int>? tagId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (itemId != null) 'item_id': itemId,
+      if (tagId != null) 'tag_id': tagId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ItemTagsCompanion copyWith(
+      {Value<int>? itemId, Value<int>? tagId, Value<int>? rowid}) {
+    return ItemTagsCompanion(
+      itemId: itemId ?? this.itemId,
+      tagId: tagId ?? this.tagId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (itemId.present) {
+      map['item_id'] = Variable<int>(itemId.value);
+    }
+    if (tagId.present) {
+      map['tag_id'] = Variable<int>(tagId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ItemTagsCompanion(')
+          ..write('itemId: $itemId, ')
+          ..write('tagId: $tagId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $CollectionsTable extends Collections
     with TableInfo<$CollectionsTable, Collection> {
   @override
@@ -1212,18 +1407,222 @@ class CollectionsCompanion extends UpdateCompanion<Collection> {
   }
 }
 
+class $ItemCollectionsTable extends ItemCollections
+    with TableInfo<$ItemCollectionsTable, ItemCollection> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ItemCollectionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _itemIdMeta = const VerificationMeta('itemId');
+  @override
+  late final GeneratedColumn<int> itemId = GeneratedColumn<int>(
+      'item_id', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES clipboard_items (id)'));
+  static const VerificationMeta _collectionIdMeta =
+      const VerificationMeta('collectionId');
+  @override
+  late final GeneratedColumn<int> collectionId = GeneratedColumn<int>(
+      'collection_id', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: true,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('REFERENCES collections (id)'));
+  @override
+  List<GeneratedColumn> get $columns => [itemId, collectionId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'item_collections';
+  @override
+  VerificationContext validateIntegrity(Insertable<ItemCollection> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('item_id')) {
+      context.handle(_itemIdMeta,
+          itemId.isAcceptableOrUnknown(data['item_id']!, _itemIdMeta));
+    } else if (isInserting) {
+      context.missing(_itemIdMeta);
+    }
+    if (data.containsKey('collection_id')) {
+      context.handle(
+          _collectionIdMeta,
+          collectionId.isAcceptableOrUnknown(
+              data['collection_id']!, _collectionIdMeta));
+    } else if (isInserting) {
+      context.missing(_collectionIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {itemId, collectionId};
+  @override
+  ItemCollection map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ItemCollection(
+      itemId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}item_id'])!,
+      collectionId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}collection_id'])!,
+    );
+  }
+
+  @override
+  $ItemCollectionsTable createAlias(String alias) {
+    return $ItemCollectionsTable(attachedDatabase, alias);
+  }
+}
+
+class ItemCollection extends DataClass implements Insertable<ItemCollection> {
+  final int itemId;
+  final int collectionId;
+  const ItemCollection({required this.itemId, required this.collectionId});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['item_id'] = Variable<int>(itemId);
+    map['collection_id'] = Variable<int>(collectionId);
+    return map;
+  }
+
+  ItemCollectionsCompanion toCompanion(bool nullToAbsent) {
+    return ItemCollectionsCompanion(
+      itemId: Value(itemId),
+      collectionId: Value(collectionId),
+    );
+  }
+
+  factory ItemCollection.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ItemCollection(
+      itemId: serializer.fromJson<int>(json['itemId']),
+      collectionId: serializer.fromJson<int>(json['collectionId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'itemId': serializer.toJson<int>(itemId),
+      'collectionId': serializer.toJson<int>(collectionId),
+    };
+  }
+
+  ItemCollection copyWith({int? itemId, int? collectionId}) => ItemCollection(
+        itemId: itemId ?? this.itemId,
+        collectionId: collectionId ?? this.collectionId,
+      );
+  ItemCollection copyWithCompanion(ItemCollectionsCompanion data) {
+    return ItemCollection(
+      itemId: data.itemId.present ? data.itemId.value : this.itemId,
+      collectionId: data.collectionId.present
+          ? data.collectionId.value
+          : this.collectionId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ItemCollection(')
+          ..write('itemId: $itemId, ')
+          ..write('collectionId: $collectionId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(itemId, collectionId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ItemCollection &&
+          other.itemId == this.itemId &&
+          other.collectionId == this.collectionId);
+}
+
+class ItemCollectionsCompanion extends UpdateCompanion<ItemCollection> {
+  final Value<int> itemId;
+  final Value<int> collectionId;
+  final Value<int> rowid;
+  const ItemCollectionsCompanion({
+    this.itemId = const Value.absent(),
+    this.collectionId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ItemCollectionsCompanion.insert({
+    required int itemId,
+    required int collectionId,
+    this.rowid = const Value.absent(),
+  })  : itemId = Value(itemId),
+        collectionId = Value(collectionId);
+  static Insertable<ItemCollection> custom({
+    Expression<int>? itemId,
+    Expression<int>? collectionId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (itemId != null) 'item_id': itemId,
+      if (collectionId != null) 'collection_id': collectionId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ItemCollectionsCompanion copyWith(
+      {Value<int>? itemId, Value<int>? collectionId, Value<int>? rowid}) {
+    return ItemCollectionsCompanion(
+      itemId: itemId ?? this.itemId,
+      collectionId: collectionId ?? this.collectionId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (itemId.present) {
+      map['item_id'] = Variable<int>(itemId.value);
+    }
+    if (collectionId.present) {
+      map['collection_id'] = Variable<int>(collectionId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ItemCollectionsCompanion(')
+          ..write('itemId: $itemId, ')
+          ..write('collectionId: $collectionId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $ClipboardItemsTable clipboardItems = $ClipboardItemsTable(this);
   late final $TagsTable tags = $TagsTable(this);
+  late final $ItemTagsTable itemTags = $ItemTagsTable(this);
   late final $CollectionsTable collections = $CollectionsTable(this);
+  late final $ItemCollectionsTable itemCollections =
+      $ItemCollectionsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [clipboardItems, tags, collections];
+      [clipboardItems, tags, itemTags, collections, itemCollections];
 }
 
 typedef $$ClipboardItemsTableCreateCompanionBuilder = ClipboardItemsCompanion
@@ -1441,6 +1840,33 @@ class $$ClipboardItemsTableFilterComposer
       column: $state.table.remoteId,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ComposableFilter itemTagsRefs(
+      ComposableFilter Function($$ItemTagsTableFilterComposer f) f) {
+    final $$ItemTagsTableFilterComposer composer = $state.composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $state.db.itemTags,
+        getReferencedColumn: (t) => t.itemId,
+        builder: (joinBuilder, parentComposers) =>
+            $$ItemTagsTableFilterComposer(ComposerState(
+                $state.db, $state.db.itemTags, joinBuilder, parentComposers)));
+    return f(composer);
+  }
+
+  ComposableFilter itemCollectionsRefs(
+      ComposableFilter Function($$ItemCollectionsTableFilterComposer f) f) {
+    final $$ItemCollectionsTableFilterComposer composer =
+        $state.composerBuilder(
+            composer: this,
+            getCurrentColumn: (t) => t.id,
+            referencedTable: $state.db.itemCollections,
+            getReferencedColumn: (t) => t.itemId,
+            builder: (joinBuilder, parentComposers) =>
+                $$ItemCollectionsTableFilterComposer(ComposerState($state.db,
+                    $state.db.itemCollections, joinBuilder, parentComposers)));
+    return f(composer);
+  }
 }
 
 class $$ClipboardItemsTableOrderingComposer
@@ -1594,6 +2020,19 @@ class $$TagsTableFilterComposer
       column: $state.table.colorValue,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ComposableFilter itemTagsRefs(
+      ComposableFilter Function($$ItemTagsTableFilterComposer f) f) {
+    final $$ItemTagsTableFilterComposer composer = $state.composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $state.db.itemTags,
+        getReferencedColumn: (t) => t.tagId,
+        builder: (joinBuilder, parentComposers) =>
+            $$ItemTagsTableFilterComposer(ComposerState(
+                $state.db, $state.db.itemTags, joinBuilder, parentComposers)));
+    return f(composer);
+  }
 }
 
 class $$TagsTableOrderingComposer
@@ -1613,6 +2052,113 @@ class $$TagsTableOrderingComposer
       column: $state.table.colorValue,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+typedef $$ItemTagsTableCreateCompanionBuilder = ItemTagsCompanion Function({
+  required int itemId,
+  required int tagId,
+  Value<int> rowid,
+});
+typedef $$ItemTagsTableUpdateCompanionBuilder = ItemTagsCompanion Function({
+  Value<int> itemId,
+  Value<int> tagId,
+  Value<int> rowid,
+});
+
+class $$ItemTagsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $ItemTagsTable,
+    ItemTag,
+    $$ItemTagsTableFilterComposer,
+    $$ItemTagsTableOrderingComposer,
+    $$ItemTagsTableCreateCompanionBuilder,
+    $$ItemTagsTableUpdateCompanionBuilder> {
+  $$ItemTagsTableTableManager(_$AppDatabase db, $ItemTagsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$ItemTagsTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$ItemTagsTableOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<int> itemId = const Value.absent(),
+            Value<int> tagId = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ItemTagsCompanion(
+            itemId: itemId,
+            tagId: tagId,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required int itemId,
+            required int tagId,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ItemTagsCompanion.insert(
+            itemId: itemId,
+            tagId: tagId,
+            rowid: rowid,
+          ),
+        ));
+}
+
+class $$ItemTagsTableFilterComposer
+    extends FilterComposer<_$AppDatabase, $ItemTagsTable> {
+  $$ItemTagsTableFilterComposer(super.$state);
+  $$ClipboardItemsTableFilterComposer get itemId {
+    final $$ClipboardItemsTableFilterComposer composer = $state.composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.itemId,
+        referencedTable: $state.db.clipboardItems,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder, parentComposers) =>
+            $$ClipboardItemsTableFilterComposer(ComposerState($state.db,
+                $state.db.clipboardItems, joinBuilder, parentComposers)));
+    return composer;
+  }
+
+  $$TagsTableFilterComposer get tagId {
+    final $$TagsTableFilterComposer composer = $state.composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.tagId,
+        referencedTable: $state.db.tags,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder, parentComposers) => $$TagsTableFilterComposer(
+            ComposerState(
+                $state.db, $state.db.tags, joinBuilder, parentComposers)));
+    return composer;
+  }
+}
+
+class $$ItemTagsTableOrderingComposer
+    extends OrderingComposer<_$AppDatabase, $ItemTagsTable> {
+  $$ItemTagsTableOrderingComposer(super.$state);
+  $$ClipboardItemsTableOrderingComposer get itemId {
+    final $$ClipboardItemsTableOrderingComposer composer =
+        $state.composerBuilder(
+            composer: this,
+            getCurrentColumn: (t) => t.itemId,
+            referencedTable: $state.db.clipboardItems,
+            getReferencedColumn: (t) => t.id,
+            builder: (joinBuilder, parentComposers) =>
+                $$ClipboardItemsTableOrderingComposer(ComposerState($state.db,
+                    $state.db.clipboardItems, joinBuilder, parentComposers)));
+    return composer;
+  }
+
+  $$TagsTableOrderingComposer get tagId {
+    final $$TagsTableOrderingComposer composer = $state.composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.tagId,
+        referencedTable: $state.db.tags,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder, parentComposers) => $$TagsTableOrderingComposer(
+            ComposerState(
+                $state.db, $state.db.tags, joinBuilder, parentComposers)));
+    return composer;
+  }
 }
 
 typedef $$CollectionsTableCreateCompanionBuilder = CollectionsCompanion
@@ -1691,6 +2237,20 @@ class $$CollectionsTableFilterComposer
                 $state.db.collections, joinBuilder, parentComposers)));
     return composer;
   }
+
+  ComposableFilter itemCollectionsRefs(
+      ComposableFilter Function($$ItemCollectionsTableFilterComposer f) f) {
+    final $$ItemCollectionsTableFilterComposer composer =
+        $state.composerBuilder(
+            composer: this,
+            getCurrentColumn: (t) => t.id,
+            referencedTable: $state.db.itemCollections,
+            getReferencedColumn: (t) => t.collectionId,
+            builder: (joinBuilder, parentComposers) =>
+                $$ItemCollectionsTableFilterComposer(ComposerState($state.db,
+                    $state.db.itemCollections, joinBuilder, parentComposers)));
+    return f(composer);
+  }
 }
 
 class $$CollectionsTableOrderingComposer
@@ -1719,12 +2279,126 @@ class $$CollectionsTableOrderingComposer
   }
 }
 
+typedef $$ItemCollectionsTableCreateCompanionBuilder = ItemCollectionsCompanion
+    Function({
+  required int itemId,
+  required int collectionId,
+  Value<int> rowid,
+});
+typedef $$ItemCollectionsTableUpdateCompanionBuilder = ItemCollectionsCompanion
+    Function({
+  Value<int> itemId,
+  Value<int> collectionId,
+  Value<int> rowid,
+});
+
+class $$ItemCollectionsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $ItemCollectionsTable,
+    ItemCollection,
+    $$ItemCollectionsTableFilterComposer,
+    $$ItemCollectionsTableOrderingComposer,
+    $$ItemCollectionsTableCreateCompanionBuilder,
+    $$ItemCollectionsTableUpdateCompanionBuilder> {
+  $$ItemCollectionsTableTableManager(
+      _$AppDatabase db, $ItemCollectionsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$ItemCollectionsTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$ItemCollectionsTableOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<int> itemId = const Value.absent(),
+            Value<int> collectionId = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ItemCollectionsCompanion(
+            itemId: itemId,
+            collectionId: collectionId,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required int itemId,
+            required int collectionId,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ItemCollectionsCompanion.insert(
+            itemId: itemId,
+            collectionId: collectionId,
+            rowid: rowid,
+          ),
+        ));
+}
+
+class $$ItemCollectionsTableFilterComposer
+    extends FilterComposer<_$AppDatabase, $ItemCollectionsTable> {
+  $$ItemCollectionsTableFilterComposer(super.$state);
+  $$ClipboardItemsTableFilterComposer get itemId {
+    final $$ClipboardItemsTableFilterComposer composer = $state.composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.itemId,
+        referencedTable: $state.db.clipboardItems,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder, parentComposers) =>
+            $$ClipboardItemsTableFilterComposer(ComposerState($state.db,
+                $state.db.clipboardItems, joinBuilder, parentComposers)));
+    return composer;
+  }
+
+  $$CollectionsTableFilterComposer get collectionId {
+    final $$CollectionsTableFilterComposer composer = $state.composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.collectionId,
+        referencedTable: $state.db.collections,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder, parentComposers) =>
+            $$CollectionsTableFilterComposer(ComposerState($state.db,
+                $state.db.collections, joinBuilder, parentComposers)));
+    return composer;
+  }
+}
+
+class $$ItemCollectionsTableOrderingComposer
+    extends OrderingComposer<_$AppDatabase, $ItemCollectionsTable> {
+  $$ItemCollectionsTableOrderingComposer(super.$state);
+  $$ClipboardItemsTableOrderingComposer get itemId {
+    final $$ClipboardItemsTableOrderingComposer composer =
+        $state.composerBuilder(
+            composer: this,
+            getCurrentColumn: (t) => t.itemId,
+            referencedTable: $state.db.clipboardItems,
+            getReferencedColumn: (t) => t.id,
+            builder: (joinBuilder, parentComposers) =>
+                $$ClipboardItemsTableOrderingComposer(ComposerState($state.db,
+                    $state.db.clipboardItems, joinBuilder, parentComposers)));
+    return composer;
+  }
+
+  $$CollectionsTableOrderingComposer get collectionId {
+    final $$CollectionsTableOrderingComposer composer = $state.composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.collectionId,
+        referencedTable: $state.db.collections,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder, parentComposers) =>
+            $$CollectionsTableOrderingComposer(ComposerState($state.db,
+                $state.db.collections, joinBuilder, parentComposers)));
+    return composer;
+  }
+}
+
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
   $$ClipboardItemsTableTableManager get clipboardItems =>
       $$ClipboardItemsTableTableManager(_db, _db.clipboardItems);
   $$TagsTableTableManager get tags => $$TagsTableTableManager(_db, _db.tags);
+  $$ItemTagsTableTableManager get itemTags =>
+      $$ItemTagsTableTableManager(_db, _db.itemTags);
   $$CollectionsTableTableManager get collections =>
       $$CollectionsTableTableManager(_db, _db.collections);
+  $$ItemCollectionsTableTableManager get itemCollections =>
+      $$ItemCollectionsTableTableManager(_db, _db.itemCollections);
 }

@@ -41,7 +41,8 @@ class Tags extends Table {
 class ItemTags extends Table {
   IntColumn get itemId => integer().references(ClipboardItems, #id)();
   IntColumn get tagId => integer().references(Tags, #id)();
-  primaryKey([itemId, tagId]);
+  @override
+  Set<Column> get primaryKey => {itemId, tagId};
 }
 
 class Collections extends Table {
@@ -53,7 +54,8 @@ class Collections extends Table {
 class ItemCollections extends Table {
   IntColumn get itemId => integer().references(ClipboardItems, #id)();
   IntColumn get collectionId => integer().references(Collections, #id)();
-  primaryKey([itemId, collectionId]);
+  @override
+  Set<Column> get primaryKey => {itemId, collectionId};
 }
 
 @DriftDatabase(tables: [ClipboardItems, Tags, ItemTags, Collections, ItemCollections])
