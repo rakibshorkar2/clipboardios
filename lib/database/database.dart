@@ -15,8 +15,9 @@ class ClipboardItems extends Table {
   TextColumn get contentHash => text().withLength(min: 64, max: 64)(); // SHA256
   IntColumn get type => intEnum<ClipType>()();
   
-  TextColumn get metadata => text().nullable()(); // JSON metadata (dimensions, file size, etc)
+  TextColumn get metadata => text().nullable()(); // JSON metadata
   TextColumn get ocrText => text().nullable()();
+  TextColumn get imagePath => text().nullable()();
   
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
@@ -30,6 +31,10 @@ class ClipboardItems extends Table {
   // Sync status
   BoolColumn get isSynced => boolean().withDefault(const Constant(false))();
   TextColumn get remoteId => text().nullable()();
+
+  // Trash support
+  BoolColumn get isDeleted => boolean().withDefault(const Constant(false))();
+  DateTimeColumn get deletedAt => dateTime().nullable()();
 }
 
 class Tags extends Table {
@@ -63,7 +68,20 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 3;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await m.addColumn(clipboardItems, clipboardItems.isDeleted);
+        await m.addColumn(clipboardItems, clipboardItems.deletedAt);
+      }
+      if (from < 3) {
+        await m.addColumn(clipboardItems, clipboardItems.imagePath);
+      }
+    },
+  );
 }
 
 LazyDatabase _openConnection() {

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:app_links/app_links.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../database/database.dart';
@@ -15,9 +16,11 @@ part 'link_handler_service.g.dart';
 @riverpod
 class LinkHandlerService extends _$LinkHandlerService {
   StreamSubscription? _intentDataStreamSubscription;
+  late final AppLinks _appLinks;
 
   @override
   void build() {
+    _appLinks = AppLinks();
     ref.onDispose(() => _intentDataStreamSubscription?.cancel());
     
     _intentDataStreamSubscription = ReceiveSharingIntent.instance.getMediaStream().listen((List<SharedMediaFile> value) {
@@ -36,6 +39,10 @@ class LinkHandlerService extends _$LinkHandlerService {
           _handleIncomingText(file.path);
         }
       }
+    });
+
+    _appLinks.allUriLinkStream.listen((uri) {
+      _handleIncomingText(uri.toString());
     });
   }
 

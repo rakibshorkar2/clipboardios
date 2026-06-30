@@ -130,6 +130,22 @@ class $ClipboardItemsTable extends ClipboardItems
   late final GeneratedColumn<String> remoteId = GeneratedColumn<String>(
       'remote_id', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _isDeletedMeta =
+      const VerificationMeta('isDeleted');
+  @override
+  late final GeneratedColumn<bool> isDeleted = GeneratedColumn<bool>(
+      'is_deleted', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_deleted" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _deletedAtMeta =
+      const VerificationMeta('deletedAt');
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+      'deleted_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -147,7 +163,9 @@ class $ClipboardItemsTable extends ClipboardItems
         isPinned,
         note,
         isSynced,
-        remoteId
+        remoteId,
+        isDeleted,
+        deletedAt
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -233,6 +251,14 @@ class $ClipboardItemsTable extends ClipboardItems
       context.handle(_remoteIdMeta,
           remoteId.isAcceptableOrUnknown(data['remote_id']!, _remoteIdMeta));
     }
+    if (data.containsKey('is_deleted')) {
+      context.handle(_isDeletedMeta,
+          isDeleted.isAcceptableOrUnknown(data['is_deleted']!, _isDeletedMeta));
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(_deletedAtMeta,
+          deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta));
+    }
     return context;
   }
 
@@ -275,6 +301,10 @@ class $ClipboardItemsTable extends ClipboardItems
           .read(DriftSqlType.bool, data['${effectivePrefix}is_synced'])!,
       remoteId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}remote_id']),
+      isDeleted: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_deleted'])!,
+      deletedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}deleted_at']),
     );
   }
 
@@ -304,6 +334,8 @@ class ClipboardItem extends DataClass implements Insertable<ClipboardItem> {
   final String? note;
   final bool isSynced;
   final String? remoteId;
+  final bool isDeleted;
+  final DateTime? deletedAt;
   const ClipboardItem(
       {required this.id,
       required this.content,
@@ -320,7 +352,9 @@ class ClipboardItem extends DataClass implements Insertable<ClipboardItem> {
       required this.isPinned,
       this.note,
       required this.isSynced,
-      this.remoteId});
+      this.remoteId,
+      required this.isDeleted,
+      this.deletedAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -351,6 +385,10 @@ class ClipboardItem extends DataClass implements Insertable<ClipboardItem> {
     if (!nullToAbsent || remoteId != null) {
       map['remote_id'] = Variable<String>(remoteId);
     }
+    map['is_deleted'] = Variable<bool>(isDeleted);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
     return map;
   }
 
@@ -378,6 +416,10 @@ class ClipboardItem extends DataClass implements Insertable<ClipboardItem> {
       remoteId: remoteId == null && nullToAbsent
           ? const Value.absent()
           : Value(remoteId),
+      isDeleted: Value(isDeleted),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
     );
   }
 
@@ -402,6 +444,8 @@ class ClipboardItem extends DataClass implements Insertable<ClipboardItem> {
       note: serializer.fromJson<String?>(json['note']),
       isSynced: serializer.fromJson<bool>(json['isSynced']),
       remoteId: serializer.fromJson<String?>(json['remoteId']),
+      isDeleted: serializer.fromJson<bool>(json['isDeleted']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
     );
   }
   @override
@@ -425,6 +469,8 @@ class ClipboardItem extends DataClass implements Insertable<ClipboardItem> {
       'note': serializer.toJson<String?>(note),
       'isSynced': serializer.toJson<bool>(isSynced),
       'remoteId': serializer.toJson<String?>(remoteId),
+      'isDeleted': serializer.toJson<bool>(isDeleted),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
     };
   }
 
@@ -444,7 +490,9 @@ class ClipboardItem extends DataClass implements Insertable<ClipboardItem> {
           bool? isPinned,
           Value<String?> note = const Value.absent(),
           bool? isSynced,
-          Value<String?> remoteId = const Value.absent()}) =>
+          Value<String?> remoteId = const Value.absent(),
+          bool? isDeleted,
+          Value<DateTime?> deletedAt = const Value.absent()}) =>
       ClipboardItem(
         id: id ?? this.id,
         content: content ?? this.content,
@@ -462,6 +510,8 @@ class ClipboardItem extends DataClass implements Insertable<ClipboardItem> {
         note: note.present ? note.value : this.note,
         isSynced: isSynced ?? this.isSynced,
         remoteId: remoteId.present ? remoteId.value : this.remoteId,
+        isDeleted: isDeleted ?? this.isDeleted,
+        deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
       );
   ClipboardItem copyWithCompanion(ClipboardItemsCompanion data) {
     return ClipboardItem(
@@ -487,6 +537,8 @@ class ClipboardItem extends DataClass implements Insertable<ClipboardItem> {
       note: data.note.present ? data.note.value : this.note,
       isSynced: data.isSynced.present ? data.isSynced.value : this.isSynced,
       remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
+      isDeleted: data.isDeleted.present ? data.isDeleted.value : this.isDeleted,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
     );
   }
 
@@ -508,7 +560,9 @@ class ClipboardItem extends DataClass implements Insertable<ClipboardItem> {
           ..write('isPinned: $isPinned, ')
           ..write('note: $note, ')
           ..write('isSynced: $isSynced, ')
-          ..write('remoteId: $remoteId')
+          ..write('remoteId: $remoteId, ')
+          ..write('isDeleted: $isDeleted, ')
+          ..write('deletedAt: $deletedAt')
           ..write(')'))
         .toString();
   }
@@ -530,7 +584,9 @@ class ClipboardItem extends DataClass implements Insertable<ClipboardItem> {
       isPinned,
       note,
       isSynced,
-      remoteId);
+      remoteId,
+      isDeleted,
+      deletedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -550,7 +606,9 @@ class ClipboardItem extends DataClass implements Insertable<ClipboardItem> {
           other.isPinned == this.isPinned &&
           other.note == this.note &&
           other.isSynced == this.isSynced &&
-          other.remoteId == this.remoteId);
+          other.remoteId == this.remoteId &&
+          other.isDeleted == this.isDeleted &&
+          other.deletedAt == this.deletedAt);
 }
 
 class ClipboardItemsCompanion extends UpdateCompanion<ClipboardItem> {
@@ -570,6 +628,8 @@ class ClipboardItemsCompanion extends UpdateCompanion<ClipboardItem> {
   final Value<String?> note;
   final Value<bool> isSynced;
   final Value<String?> remoteId;
+  final Value<bool> isDeleted;
+  final Value<DateTime?> deletedAt;
   const ClipboardItemsCompanion({
     this.id = const Value.absent(),
     this.content = const Value.absent(),
@@ -587,6 +647,8 @@ class ClipboardItemsCompanion extends UpdateCompanion<ClipboardItem> {
     this.note = const Value.absent(),
     this.isSynced = const Value.absent(),
     this.remoteId = const Value.absent(),
+    this.isDeleted = const Value.absent(),
+    this.deletedAt = const Value.absent(),
   });
   ClipboardItemsCompanion.insert({
     this.id = const Value.absent(),
@@ -605,6 +667,8 @@ class ClipboardItemsCompanion extends UpdateCompanion<ClipboardItem> {
     this.note = const Value.absent(),
     this.isSynced = const Value.absent(),
     this.remoteId = const Value.absent(),
+    this.isDeleted = const Value.absent(),
+    this.deletedAt = const Value.absent(),
   })  : content = Value(content),
         normalizedContent = Value(normalizedContent),
         contentHash = Value(contentHash),
@@ -626,6 +690,8 @@ class ClipboardItemsCompanion extends UpdateCompanion<ClipboardItem> {
     Expression<String>? note,
     Expression<bool>? isSynced,
     Expression<String>? remoteId,
+    Expression<bool>? isDeleted,
+    Expression<DateTime>? deletedAt,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -644,6 +710,8 @@ class ClipboardItemsCompanion extends UpdateCompanion<ClipboardItem> {
       if (note != null) 'note': note,
       if (isSynced != null) 'is_synced': isSynced,
       if (remoteId != null) 'remote_id': remoteId,
+      if (isDeleted != null) 'is_deleted': isDeleted,
+      if (deletedAt != null) 'deleted_at': deletedAt,
     });
   }
 
@@ -663,7 +731,9 @@ class ClipboardItemsCompanion extends UpdateCompanion<ClipboardItem> {
       Value<bool>? isPinned,
       Value<String?>? note,
       Value<bool>? isSynced,
-      Value<String?>? remoteId}) {
+      Value<String?>? remoteId,
+      Value<bool>? isDeleted,
+      Value<DateTime?>? deletedAt}) {
     return ClipboardItemsCompanion(
       id: id ?? this.id,
       content: content ?? this.content,
@@ -681,6 +751,8 @@ class ClipboardItemsCompanion extends UpdateCompanion<ClipboardItem> {
       note: note ?? this.note,
       isSynced: isSynced ?? this.isSynced,
       remoteId: remoteId ?? this.remoteId,
+      isDeleted: isDeleted ?? this.isDeleted,
+      deletedAt: deletedAt ?? this.deletedAt,
     );
   }
 
@@ -736,6 +808,12 @@ class ClipboardItemsCompanion extends UpdateCompanion<ClipboardItem> {
     if (remoteId.present) {
       map['remote_id'] = Variable<String>(remoteId.value);
     }
+    if (isDeleted.present) {
+      map['is_deleted'] = Variable<bool>(isDeleted.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
     return map;
   }
 
@@ -757,7 +835,9 @@ class ClipboardItemsCompanion extends UpdateCompanion<ClipboardItem> {
           ..write('isPinned: $isPinned, ')
           ..write('note: $note, ')
           ..write('isSynced: $isSynced, ')
-          ..write('remoteId: $remoteId')
+          ..write('remoteId: $remoteId, ')
+          ..write('isDeleted: $isDeleted, ')
+          ..write('deletedAt: $deletedAt')
           ..write(')'))
         .toString();
   }
@@ -1643,6 +1723,8 @@ typedef $$ClipboardItemsTableCreateCompanionBuilder = ClipboardItemsCompanion
   Value<String?> note,
   Value<bool> isSynced,
   Value<String?> remoteId,
+  Value<bool> isDeleted,
+  Value<DateTime?> deletedAt,
 });
 typedef $$ClipboardItemsTableUpdateCompanionBuilder = ClipboardItemsCompanion
     Function({
@@ -1662,6 +1744,8 @@ typedef $$ClipboardItemsTableUpdateCompanionBuilder = ClipboardItemsCompanion
   Value<String?> note,
   Value<bool> isSynced,
   Value<String?> remoteId,
+  Value<bool> isDeleted,
+  Value<DateTime?> deletedAt,
 });
 
 class $$ClipboardItemsTableTableManager extends RootTableManager<
@@ -1698,6 +1782,8 @@ class $$ClipboardItemsTableTableManager extends RootTableManager<
             Value<String?> note = const Value.absent(),
             Value<bool> isSynced = const Value.absent(),
             Value<String?> remoteId = const Value.absent(),
+            Value<bool> isDeleted = const Value.absent(),
+            Value<DateTime?> deletedAt = const Value.absent(),
           }) =>
               ClipboardItemsCompanion(
             id: id,
@@ -1716,6 +1802,8 @@ class $$ClipboardItemsTableTableManager extends RootTableManager<
             note: note,
             isSynced: isSynced,
             remoteId: remoteId,
+            isDeleted: isDeleted,
+            deletedAt: deletedAt,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
@@ -1734,6 +1822,8 @@ class $$ClipboardItemsTableTableManager extends RootTableManager<
             Value<String?> note = const Value.absent(),
             Value<bool> isSynced = const Value.absent(),
             Value<String?> remoteId = const Value.absent(),
+            Value<bool> isDeleted = const Value.absent(),
+            Value<DateTime?> deletedAt = const Value.absent(),
           }) =>
               ClipboardItemsCompanion.insert(
             id: id,
@@ -1752,6 +1842,8 @@ class $$ClipboardItemsTableTableManager extends RootTableManager<
             note: note,
             isSynced: isSynced,
             remoteId: remoteId,
+            isDeleted: isDeleted,
+            deletedAt: deletedAt,
           ),
         ));
 }
@@ -1838,6 +1930,16 @@ class $$ClipboardItemsTableFilterComposer
 
   ColumnFilters<String> get remoteId => $state.composableBuilder(
       column: $state.table.remoteId,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<bool> get isDeleted => $state.composableBuilder(
+      column: $state.table.isDeleted,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get deletedAt => $state.composableBuilder(
+      column: $state.table.deletedAt,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
@@ -1949,6 +2051,16 @@ class $$ClipboardItemsTableOrderingComposer
 
   ColumnOrderings<String> get remoteId => $state.composableBuilder(
       column: $state.table.remoteId,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<bool> get isDeleted => $state.composableBuilder(
+      column: $state.table.isDeleted,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get deletedAt => $state.composableBuilder(
+      column: $state.table.deletedAt,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }

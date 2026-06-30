@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:file_picker/file_picker.dart';
 import '../../services/auth_service.dart';
 import '../../services/stats_service.dart';
 import '../../services/export_service.dart';
@@ -32,6 +34,7 @@ class SettingsScreen extends ConsumerWidget {
                       subtitle: Text(user?.email ?? 'Sign in to sync with Google Drive'),
                       trailing: const CupertinoListTileChevron(),
                       onTap: () {
+                        HapticFeedback.lightImpact();
                         if (user == null) {
                           ref.read(authServiceProvider.notifier).signIn();
                         } else {
@@ -46,7 +49,10 @@ class SettingsScreen extends ConsumerWidget {
                     CupertinoListTile(
                       title: const Text('Sync Now'),
                       trailing: const Icon(CupertinoIcons.refresh, size: 20),
-                      onTap: () => ref.read(syncServiceProvider.notifier).sync(),
+                      onTap: () {
+                        HapticFeedback.mediumImpact();
+                        ref.read(syncServiceProvider.notifier).sync();
+                      },
                     ),
                 ],
               ),
@@ -57,7 +63,10 @@ class SettingsScreen extends ConsumerWidget {
                     title: const Text('Biometric Lock'),
                     trailing: CupertinoSwitch(
                       value: biometricState.value ?? false,
-                      onChanged: (v) => ref.read(biometricServiceProvider.notifier).setEnabled(v),
+                      onChanged: (v) {
+                        HapticFeedback.selectionClick();
+                        ref.read(biometricServiceProvider.notifier).setEnabled(v);
+                      },
                     ),
                   ),
                 ],
@@ -68,12 +77,32 @@ class SettingsScreen extends ConsumerWidget {
                   CupertinoListTile(
                     title: const Text('Export to JSON'),
                     trailing: const Icon(CupertinoIcons.share, size: 20),
-                    onTap: () => ref.read(exportServiceProvider.notifier).exportToJson(),
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      ref.read(exportServiceProvider.notifier).exportToJson();
+                    },
                   ),
                   CupertinoListTile(
                     title: const Text('Export to CSV'),
                     trailing: const Icon(CupertinoIcons.share, size: 20),
-                    onTap: () => ref.read(exportServiceProvider.notifier).exportToCsv(),
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      ref.read(exportServiceProvider.notifier).exportToCsv();
+                    },
+                  ),
+                  CupertinoListTile(
+                    title: const Text('Import from JSON'),
+                    trailing: const Icon(CupertinoIcons.folder_badge_plus, size: 20),
+                    onTap: () async {
+                      HapticFeedback.lightImpact();
+                      final result = await FilePicker.platform.pickFiles(
+                        type: FileType.custom,
+                        allowedExtensions: ['json'],
+                      );
+                      if (result != null && result.files.single.path != null) {
+                        await ref.read(exportServiceProvider.notifier).importFromJson(result.files.single.path!);
+                      }
+                    },
                   ),
                 ],
               ),
@@ -97,6 +126,14 @@ class SettingsScreen extends ConsumerWidget {
                             title: const Text('Favorites'),
                             trailing: Text('${stats['favoritesCount']}'),
                           ),
+                          CupertinoListTile(
+                            title: const Text('Most Active Day'),
+                            trailing: Text('${stats['mostActiveDay']}'),
+                          ),
+                          CupertinoListTile(
+                            title: const Text('Longest Streak'),
+                            trailing: Text('${stats['longestStreak']} days'),
+                          ),
                         ],
                       );
                     },
@@ -111,7 +148,7 @@ class SettingsScreen extends ConsumerWidget {
                   CupertinoListTile(
                     title: const Text('Appearance'),
                     trailing: const Text('System'),
-                    onTap: () {},
+                    onTap: () => HapticFeedback.lightImpact(),
                   ),
                 ],
               ),

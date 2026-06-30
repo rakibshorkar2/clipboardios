@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import '../../database/database.dart';
 import '../../services/clipboard_service.dart';
 import '../../widgets/clip_item_tile.dart';
@@ -11,7 +13,6 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Start clipboard monitoring
     ref.watch(clipboardServiceProvider);
     final db = ref.watch(appDatabaseProvider);
     
@@ -23,6 +24,7 @@ class HomeScreen extends ConsumerWidget {
           ),
           StreamBuilder<List<ClipboardItem>>(
             stream: (db.select(db.clipboardItems)
+                  ..where((t) => t.isDeleted.equals(false))
                   ..orderBy([
                     (t) => OrderingTerm(expression: t.isPinned, mode: OrderingMode.desc),
                     (t) => OrderingTerm(expression: t.lastCopiedAt, mode: OrderingMode.desc),
@@ -42,10 +44,29 @@ class HomeScreen extends ConsumerWidget {
                 );
               }
 
+              final groupedItems = _groupItems(items);
+
               return SliverList(
                 delegate: SliverChildBuilderDelegate(
-                  (context, index) => ClipItemTile(item: items[index]),
-                  childCount: items.length,
+                  (context, index) {
+                    final entry = groupedItems[index];
+                    if (entry is String) {
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+                        child: Text(
+                          entry.toUpperCase(),
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: CupertinoColors.secondaryLabel.resolveFrom(context),
+                          ),
+                        ),
+                      );
+                    } else {
+                      return ClipItemTile(item: entry as ClipboardItem);
+                    }
+                  },
+                  childCount: groupedItems.length,
                 ),
               );
             },
@@ -53,5 +74,37 @@ class HomeScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  List<dynamic> _groupItems(List<ClipboardItem> items) {
+    final grouped = <dynamic>[];
+    String? currentGroup;
+
+    for (final item in items) {
+      if (item.isPinned) {
+        if (currentGroup != 'Pinned') {
+          currentGroup = 'Pinned';
+          grouped.add('Pinned');
+        }
+      } else {
+        final now = DateTime.now();
+        final diff = now.difference(item.lastCopiedAt).inDays;
+        String group;
+        if (diff == 0) {
+          group = 'Today';
+        } else if (diff == 1) {
+          group = 'Yesterday';
+        } else {
+          group = 'Older';
+        }
+
+        if (currentGroup != group) {
+          currentGroup = group;
+          grouped.add(group);
+        }
+      }
+      grouped.add(item);
+    }
+    return grouped;
   }
 }

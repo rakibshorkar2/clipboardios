@@ -21,7 +21,7 @@ class FavoritesScreen extends ConsumerWidget {
           ),
           StreamBuilder<List<ClipboardItem>>(
             stream: (db.select(db.clipboardItems)
-                  ..where((t) => t.isFavorite.equals(true))
+                  ..where((t) => t.isFavorite.equals(true) & t.isDeleted.equals(false))
                   ..orderBy([(t) => OrderingTerm(expression: t.lastCopiedAt, mode: OrderingMode.desc)]))
                 .watch(),
             builder: (context, snapshot) {

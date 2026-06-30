@@ -54,4 +54,31 @@ class ExportService extends _$ExportService {
 
     await Share.shareXFiles([XFile(file.path)], text: 'ClipVault Export');
   }
+
+  Future<void> importFromJson(String jsonPath) async {
+    try {
+      final file = File(jsonPath);
+      final jsonString = await file.readAsString();
+      final List<dynamic> data = jsonDecode(jsonString);
+      
+      final db = ref.read(appDatabaseProvider);
+      for (var entry in data) {
+        final content = entry['content'] as String;
+        final normalized = content.trim().replaceAll(RegExp(r'\s+'), ' ').toLowerCase();
+        
+        await db.into(db.clipboardItems).insert(ClipboardItemsCompanion.insert(
+          content: content,
+          normalizedContent: normalized,
+          contentHash: 'imported_${DateTime.now().millisecondsSinceEpoch}_${content.hashCode}',
+          type: ClipType.values.firstWhere((e) => e.name == entry['type'], orElse: () => ClipType.text),
+          createdAt: Value(DateTime.parse(entry['createdAt'])),
+          updatedAt: Value(DateTime.now()),
+          lastCopiedAt: Value(DateTime.now()),
+          note: Value(entry['note']),
+        ));
+      }
+    } catch (e) {
+      print("Import error: $e");
+    }
+  }
 }

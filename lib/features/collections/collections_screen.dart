@@ -16,7 +16,15 @@ class CollectionsScreen extends ConsumerWidget {
         slivers: [
           const CupertinoSliverNavigationBar(
             largeTitle: Text('Collections'),
-            trailing: Icon(CupertinoIcons.add),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: CupertinoButton.filled(
+                child: const Text('Add Collection'),
+                onPressed: () => _showAddCollectionDialog(context, ref),
+              ),
+            ),
           ),
           StreamBuilder<List<Collection>>(
             stream: db.select(db.collections).watch(),
@@ -39,7 +47,22 @@ class CollectionsScreen extends ConsumerWidget {
               );
             },
           ),
-          const SliverToBoxAdapter(child: Padding(padding: EdgeInsets.all(16), child: Text('Tags', style: TextStyle(fontWeight: FontWeight.bold)))),
+          const SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(16, 32, 16, 8),
+              child: Text('Tags', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: CupertinoButton(
+                color: CupertinoColors.systemGrey5,
+                child: const Text('Add Tag', style: TextStyle(color: CupertinoColors.activeBlue)),
+                onPressed: () => _showAddTagDialog(context, ref),
+              ),
+            ),
+          ),
           StreamBuilder<List<Tag>>(
             stream: db.select(db.tags).watch(),
             builder: (context, snapshot) {
@@ -61,6 +84,60 @@ class CollectionsScreen extends ConsumerWidget {
                   childCount: tags.length,
                 ),
               );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddCollectionDialog(BuildContext context, WidgetRef ref) {
+    final controller = TextEditingController();
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('New Collection'),
+        content: Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: CupertinoTextField(controller: controller, placeholder: 'Collection Name'),
+        ),
+        actions: [
+          CupertinoDialogAction(child: const Text('Cancel'), onPressed: () => Navigator.pop(context)),
+          CupertinoDialogAction(
+            child: const Text('Create'),
+            onPressed: () async {
+              if (controller.text.isNotEmpty) {
+                final db = ref.read(appDatabaseProvider);
+                await db.into(db.collections).insert(CollectionsCompanion.insert(name: controller.text));
+                Navigator.pop(context);
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAddTagDialog(BuildContext context, WidgetRef ref) {
+    final controller = TextEditingController();
+    showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text('New Tag'),
+        content: Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: CupertinoTextField(controller: controller, placeholder: 'Tag Name'),
+        ),
+        actions: [
+          CupertinoDialogAction(child: const Text('Cancel'), onPressed: () => Navigator.pop(context)),
+          CupertinoDialogAction(
+            child: const Text('Create'),
+            onPressed: () async {
+              if (controller.text.isNotEmpty) {
+                final db = ref.read(appDatabaseProvider);
+                await db.into(db.tags).insert(TagsCompanion.insert(name: controller.text));
+                Navigator.pop(context);
+              }
             },
           ),
         ],
