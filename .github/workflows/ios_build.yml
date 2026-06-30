@@ -28,13 +28,16 @@ jobs:
       run: |
         sed -i '' 's/CODE_SIGNING_ALLOWED = YES/CODE_SIGNING_ALLOWED = NO/g' ios/Runner.xcodeproj/project.pbxproj
         sed -i '' 's/CODE_SIGNING_REQUIRED = YES/CODE_SIGNING_REQUIRED = NO/g' ios/Runner.xcodeproj/project.pbxproj
+        sed -i '' 's/PROVISIONING_PROFILE_SPECIFIER = //g' ios/Runner.xcodeproj/project.pbxproj
         echo "CODE_SIGNING_ALLOWED=NO" >> ios/Flutter/Generated.xcconfig
         echo "CODE_SIGNING_REQUIRED=NO" >> ios/Flutter/Generated.xcconfig
         echo "CODE_SIGN_IDENTITY=" >> ios/Flutter/Generated.xcconfig
+        echo "PROVISIONING_PROFILE_SPECIFIER=" >> ios/Flutter/Generated.xcconfig
 
     - name: Build iOS
       run: |
-        flutter build ios --release --no-codesign
+        # Use xcodebuild directly through flutter to pass extra flags
+        flutter build ios --release --no-codesign --extra-gen-snapshot-options=--no-codesign --build-number=1 --build-name=1.0.0
       
     - name: Create IPA
       run: |
