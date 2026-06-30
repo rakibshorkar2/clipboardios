@@ -1,17 +1,25 @@
-platform :ios, '12.0'
+# Set the global platform to iOS 13.0
+platform :ios, '13.0'
+
+# Import Flutter helper scripts
+target_path = File.dirname(File.realpath(__FILE__))
+require File.join(target_path, 'Flutter', 'generated_helper.rb')
 
 target 'Runner' do
   use_frameworks!
   use_modular_headers!
 
-  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
+  # Install all iOS pods managed by Flutter
+  flutter_install_all_ios_pods target_path
 end
 
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
+
+    # Ensure all targets use the same deployment target to avoid warnings
     target.build_configurations.each do |config|
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
     end
   end
 end
