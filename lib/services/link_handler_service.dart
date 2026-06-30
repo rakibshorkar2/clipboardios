@@ -5,8 +5,10 @@ import '../database/database.dart';
 import '../models/clip_type.dart';
 import 'package:drift/drift.dart';
 import 'clipboard_service.dart';
+import 'metadata_service.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
+import '../core/providers.dart';
 
 part 'link_handler_service.g.dart';
 
@@ -18,7 +20,6 @@ class LinkHandlerService extends _$LinkHandlerService {
   void build() {
     ref.onDispose(() => _intentDataStreamSubscription?.cancel());
     
-    // For sharing or opening URLs while the app is running
     _intentDataStreamSubscription = ReceiveSharingIntent.instance.getMediaStream().listen((List<SharedMediaFile> value) {
       for (var file in value) {
         if (file.type == SharedMediaType.text || file.type == SharedMediaType.url) {
@@ -29,7 +30,6 @@ class LinkHandlerService extends _$LinkHandlerService {
       print("getMediaStream error: $err");
     });
 
-    // For sharing or opening URLs when the app is closed
     ReceiveSharingIntent.instance.getInitialMedia().then((List<SharedMediaFile> value) {
       for (var file in value) {
         if (file.type == SharedMediaType.text || file.type == SharedMediaType.url) {
@@ -46,7 +46,6 @@ class LinkHandlerService extends _$LinkHandlerService {
     final normalized = text.trim().replaceAll(RegExp(r'\s+'), ' ').toLowerCase();
     final hash = sha256.convert(utf8.encode(normalized)).toString();
 
-    // Check if duplicate
     final existing = await (db.select(db.clipboardItems)
           ..where((t) => t.contentHash.equals(hash)))
         .getSingleOrNull();
@@ -59,8 +58,8 @@ class LinkHandlerService extends _$LinkHandlerService {
             lastCopiedAt: Value(DateTime.now()),
           ));
     } else {
-      final type = _detectType(text);
-      await db.into(db.clipboardItems).insert(ClipboardItemsCompanion.insert(
+      final type = ClipboardService.detectType(text);
+      final id = await db.into(db.clipboardItems).insert(ClipboardItemsCompanion.insert(
             content: text,
             normalizedContent: normalized,
             contentHash: hash,
@@ -70,12 +69,21 @@ class LinkHandlerService extends _$LinkHandlerService {
             lastCopiedAt: Value(DateTime.now()),
             copyCount: const Value(1),
           ));
+
+      if (type == ClipType.url) {
+        _processUrlMetadata(id, text);
+      }
     }
   }
 
-  ClipType _detectType(String text) {
-    if (text.startsWith('magnet:?xt=')) return ClipType.magnet;
-    if (RegExp(r'^https?://[^\s]+$').hasMatch(text)) return ClipType.url;
-    return ClipType.text;
+  Future<void> _processUrlMetadata(int id, String url) async {
+    final metadata = await ref.read(metadataServiceProvider.notifier).fetchMetadata(url);
+    if (metadata.isNotEmpty) {
+      final db = ref.read(appDatabaseProvider);
+      await (db.update(db.clipboardItems)..where((t) => t.id.equals(id)))
+          .write(ClipboardItemsCompanion(
+            metadata: Value(jsonEncode(metadata)),
+          ));
+    }
   }
 }

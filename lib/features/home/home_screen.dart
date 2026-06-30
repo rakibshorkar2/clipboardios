@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
-import 'package:drift/drift.dart' hide Column;
 import '../../database/database.dart';
 import '../../services/clipboard_service.dart';
-import '../../models/clip_type.dart';
+import '../../widgets/clip_item_tile.dart';
+import 'package:drift/drift.dart' hide Column;
+import '../../core/providers.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -23,7 +23,10 @@ class HomeScreen extends ConsumerWidget {
           ),
           StreamBuilder<List<ClipboardItem>>(
             stream: (db.select(db.clipboardItems)
-                  ..orderBy([(t) => OrderingTerm(expression: t.lastCopiedAt, mode: OrderingMode.desc)]))
+                  ..orderBy([
+                    (t) => OrderingTerm(expression: t.isPinned, mode: OrderingMode.desc),
+                    (t) => OrderingTerm(expression: t.lastCopiedAt, mode: OrderingMode.desc),
+                  ]))
                 .watch(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -41,10 +44,7 @@ class HomeScreen extends ConsumerWidget {
 
               return SliverList(
                 delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final item = items[index];
-                    return _ClipItemTile(item: item);
-                  },
+                  (context, index) => ClipItemTile(item: items[index]),
                   childCount: items.length,
                 ),
               );
@@ -53,42 +53,5 @@ class HomeScreen extends ConsumerWidget {
         ],
       ),
     );
-  }
-}
-
-class _ClipItemTile extends StatelessWidget {
-  final ClipboardItem item;
-  const _ClipItemTile({required this.item});
-
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoListTile.notched(
-      title: Text(
-        item.content.trim(),
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-      ),
-      subtitle: Text(
-        '${item.type.name.toUpperCase()} • ${DateFormat.jm().format(item.lastCopiedAt)} • Copied ${item.copyCount}x',
-      ),
-      leading: _getTypeIcon(item.type),
-      trailing: const CupertinoListTileChevron(),
-      onTap: () {
-        // Show details or copy back to clipboard
-      },
-    );
-  }
-
-  Widget _getTypeIcon(ClipType type) {
-    IconData iconData;
-    switch (type) {
-      case ClipType.url: iconData = CupertinoIcons.link; break;
-      case ClipType.image: iconData = CupertinoIcons.photo; break;
-      case ClipType.email: iconData = CupertinoIcons.mail; break;
-      case ClipType.phone: iconData = CupertinoIcons.phone; break;
-      case ClipType.magnet: iconData = CupertinoIcons.bolt; break;
-      default: iconData = CupertinoIcons.doc_text;
-    }
-    return Icon(iconData, color: CupertinoColors.systemBlue);
   }
 }

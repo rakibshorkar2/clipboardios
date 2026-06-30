@@ -6,21 +6,7 @@ part of 'clipboard_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$appDatabaseHash() => r'68c9ad772c198d1a34d2dcccc0a6a35f43092fd5';
-
-/// See also [appDatabase].
-@ProviderFor(appDatabase)
-final appDatabaseProvider = AutoDisposeProvider<AppDatabase>.internal(
-  appDatabase,
-  name: r'appDatabaseProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$appDatabaseHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef AppDatabaseRef = AutoDisposeProviderRef<AppDatabase>;
-String _$clipboardServiceHash() => r'b1384973cfa62c8771e3301789a286ba33937b05';
+String _$clipboardServiceHash() => r'8417a8d09bddafff181f2c075791f723e0511047';
 
 /// See also [ClipboardService].
 @ProviderFor(ClipboardService)

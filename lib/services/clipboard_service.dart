@@ -6,6 +6,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../database/database.dart';
 import '../models/clip_type.dart';
 import 'package:drift/drift.dart';
+import 'metadata_service.dart';
+import 'ocr_service.dart';
+import '../core/providers.dart';
 
 part 'clipboard_service.g.dart';
 
@@ -40,13 +43,11 @@ class ClipboardService extends _$ClipboardService {
 
     final db = ref.read(appDatabaseProvider);
     
-    // Check if duplicate in DB
     final existing = await (db.select(db.clipboardItems)
           ..where((t) => t.contentHash.equals(hash)))
         .getSingleOrNull();
 
     if (existing != null) {
-      // Update counter and last copied date
       await (db.update(db.clipboardItems)
             ..where((t) => t.id.equals(existing.id)))
           .write(ClipboardItemsCompanion(
@@ -54,9 +55,8 @@ class ClipboardService extends _$ClipboardService {
             lastCopiedAt: Value(DateTime.now()),
           ));
     } else {
-      // Create new entry
-      final type = _detectType(text);
-      await db.into(db.clipboardItems).insert(ClipboardItemsCompanion.insert(
+      final type = detectType(text);
+      final id = await db.into(db.clipboardItems).insert(ClipboardItemsCompanion.insert(
             content: text,
             normalizedContent: normalized,
             contentHash: hash,
@@ -66,11 +66,26 @@ class ClipboardService extends _$ClipboardService {
             lastCopiedAt: Value(DateTime.now()),
             copyCount: const Value(1),
           ));
+          
+      // Secondary processing
+      if (type == ClipType.url) {
+        _processUrlMetadata(id, text);
+      }
+    }
+  }
+
+  Future<void> _processUrlMetadata(int id, String url) async {
+    final metadata = await ref.read(metadataServiceProvider.notifier).fetchMetadata(url);
+    if (metadata.isNotEmpty) {
+      final db = ref.read(appDatabaseProvider);
+      await (db.update(db.clipboardItems)..where((t) => t.id.equals(id)))
+          .write(ClipboardItemsCompanion(
+            metadata: Value(jsonEncode(metadata)),
+          ));
     }
   }
 
   String _normalizeText(String text) {
-    // Ignore whitespace differences, line ending differences, and capitalization (optional in PRD)
     return text.trim().replaceAll(RegExp(r'\s+'), ' ').toLowerCase();
   }
 
@@ -78,26 +93,38 @@ class ClipboardService extends _$ClipboardService {
     return sha256.convert(utf8.encode(text)).toString();
   }
 
-  ClipType _detectType(String text) {
+  static ClipType detectType(String text) {
     if (text.startsWith('magnet:?xt=')) return ClipType.magnet;
-    if (RegExp(r'^https?://[^\s]+$').hasMatch(text)) return ClipType.url;
-    if (RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(text)) return ClipType.email;
-    if (RegExp(r'^\+?[0-9\s\-()]{7,20}$').hasMatch(text)) return ClipType.phone;
+    if (text.startsWith('torrent:')) return ClipType.torrent;
     
-    // Simple JSON check
+    final urlRegex = RegExp(r'^https?://[^\s]+$');
+    if (urlRegex.hasMatch(text)) return ClipType.url;
+
+    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    if (emailRegex.hasMatch(text)) return ClipType.email;
+
+    final phoneRegex = RegExp(r'^\+?[0-9\s\-()]{7,20}$');
+    if (phoneRegex.hasMatch(text)) return ClipType.phone;
+
+    if (text.length > 8 && 
+        RegExp(r'[A-Z]').hasMatch(text) && 
+        RegExp(r'[0-9]').hasMatch(text) && 
+        RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(text)) {
+      return ClipType.password;
+    }
+
+    if (RegExp(r'^(1|3|bc1)[a-zA-HJ-NP-Z0-9]{25,39}$').hasMatch(text)) return ClipType.code;
+
     try {
-      jsonDecode(text);
-      return ClipType.json;
+      final decoded = jsonDecode(text);
+      if (decoded is Map || decoded is List) return ClipType.json;
     } catch (_) {}
 
-    // Simple Markdown check (presence of headers or links)
+    if (text.contains(RegExp(r'SELECT|INSERT|UPDATE|DELETE|CREATE|DROP', caseSensitive: false)) && text.contains('FROM')) return ClipType.code;
+    if (text.contains(RegExp(r'fun |var |val |def |class |void |int |String '))) return ClipType.code;
+
     if (text.contains(RegExp(r'^#\s|\[.*\]\(.*\)', multiLine: true))) return ClipType.markdown;
 
     return ClipType.text;
   }
-}
-
-@riverpod
-AppDatabase appDatabase(AppDatabaseRef ref) {
-  return AppDatabase();
 }

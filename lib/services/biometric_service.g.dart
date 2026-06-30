@@ -1,27 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'link_handler_service.dart';
+part of 'biometric_service.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$linkHandlerServiceHash() =>
-    r'540c61c071213637139e4c59351b5f7bb31c013a';
+String _$biometricServiceHash() => r'7c61127281a6765298681248d303bb335fe7536c';
 
-/// See also [LinkHandlerService].
-@ProviderFor(LinkHandlerService)
-final linkHandlerServiceProvider =
-    AutoDisposeNotifierProvider<LinkHandlerService, void>.internal(
-  LinkHandlerService.new,
-  name: r'linkHandlerServiceProvider',
+/// See also [BiometricService].
+@ProviderFor(BiometricService)
+final biometricServiceProvider =
+    AutoDisposeAsyncNotifierProvider<BiometricService, bool>.internal(
+  BiometricService.new,
+  name: r'biometricServiceProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$linkHandlerServiceHash,
+      : _$biometricServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$LinkHandlerService = AutoDisposeNotifier<void>;
+typedef _$BiometricService = AutoDisposeAsyncNotifier<bool>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

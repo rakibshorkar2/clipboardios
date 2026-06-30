@@ -1,27 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'link_handler_service.dart';
+part of 'export_service.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$linkHandlerServiceHash() =>
-    r'540c61c071213637139e4c59351b5f7bb31c013a';
+String _$exportServiceHash() => r'25546c84510cb4067e5a22edf25b350607fa0fd3';
 
-/// See also [LinkHandlerService].
-@ProviderFor(LinkHandlerService)
-final linkHandlerServiceProvider =
-    AutoDisposeNotifierProvider<LinkHandlerService, void>.internal(
-  LinkHandlerService.new,
-  name: r'linkHandlerServiceProvider',
+/// See also [ExportService].
+@ProviderFor(ExportService)
+final exportServiceProvider =
+    AutoDisposeNotifierProvider<ExportService, void>.internal(
+  ExportService.new,
+  name: r'exportServiceProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$linkHandlerServiceHash,
+      : _$exportServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$LinkHandlerService = AutoDisposeNotifier<void>;
+typedef _$ExportService = AutoDisposeNotifier<void>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

@@ -1,27 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'link_handler_service.dart';
+part of 'metadata_service.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$linkHandlerServiceHash() =>
-    r'540c61c071213637139e4c59351b5f7bb31c013a';
+String _$metadataServiceHash() => r'85594cf889808750ac1ded4390ff8a2bb8febad0';
 
-/// See also [LinkHandlerService].
-@ProviderFor(LinkHandlerService)
-final linkHandlerServiceProvider =
-    AutoDisposeNotifierProvider<LinkHandlerService, void>.internal(
-  LinkHandlerService.new,
-  name: r'linkHandlerServiceProvider',
+/// See also [MetadataService].
+@ProviderFor(MetadataService)
+final metadataServiceProvider =
+    AutoDisposeNotifierProvider<MetadataService, void>.internal(
+  MetadataService.new,
+  name: r'metadataServiceProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$linkHandlerServiceHash,
+      : _$metadataServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$LinkHandlerService = AutoDisposeNotifier<void>;
+typedef _$MetadataService = AutoDisposeNotifier<void>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

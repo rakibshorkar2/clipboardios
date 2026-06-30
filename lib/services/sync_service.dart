@@ -7,6 +7,7 @@ import 'auth_service.dart';
 import 'encryption_service.dart';
 import 'package:drift/drift.dart';
 import 'clipboard_service.dart';
+import '../core/providers.dart';
 
 part 'sync_service.g.dart';
 
