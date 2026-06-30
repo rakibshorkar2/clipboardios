@@ -7,7 +7,7 @@ part of 'link_handler_service.dart';
 // **************************************************************************
 
 String _$linkHandlerServiceHash() =>
-    r'540c61c071213637139e4c59351b5f7bb31c013a';
+    r'44c763058a1815e3b9bcb2f9c55ebc8b51015e2b';
 
 /// See also [LinkHandlerService].
 @ProviderFor(LinkHandlerService)

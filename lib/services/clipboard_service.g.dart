@@ -6,7 +6,7 @@ part of 'clipboard_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$clipboardServiceHash() => r'cddd8fcb0beb388a47abf71f30d0bc637daf3ab4';
+String _$clipboardServiceHash() => r'f07a70cfe48bb89f6907fd0611f4fc2744959193';
 
 /// See also [ClipboardService].
 @ProviderFor(ClipboardService)

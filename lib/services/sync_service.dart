@@ -6,6 +6,7 @@ import '../database/database.dart';
 import 'auth_service.dart';
 import 'encryption_service.dart';
 import 'package:drift/drift.dart';
+import '../models/clip_type.dart';
 import 'clipboard_service.dart';
 import 'notification_service.dart';
 import '../core/providers.dart';

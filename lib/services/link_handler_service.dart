@@ -41,7 +41,8 @@ class LinkHandlerService extends _$LinkHandlerService {
       }
     });
 
-    _appLinks.allUriLinkStream.listen((uri) {
+    // Handle App Links (Universal Links / Custom URL Schemes)
+    _appLinks.uriLinkStream.listen((uri) {
       _handleIncomingText(uri.toString());
     });
   }

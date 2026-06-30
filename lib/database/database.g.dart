@@ -57,6 +57,12 @@ class $ClipboardItemsTable extends ClipboardItems
   late final GeneratedColumn<String> ocrText = GeneratedColumn<String>(
       'ocr_text', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _imagePathMeta =
+      const VerificationMeta('imagePath');
+  @override
+  late final GeneratedColumn<String> imagePath = GeneratedColumn<String>(
+      'image_path', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -155,6 +161,7 @@ class $ClipboardItemsTable extends ClipboardItems
         type,
         metadata,
         ocrText,
+        imagePath,
         createdAt,
         updatedAt,
         lastCopiedAt,
@@ -210,6 +217,10 @@ class $ClipboardItemsTable extends ClipboardItems
     if (data.containsKey('ocr_text')) {
       context.handle(_ocrTextMeta,
           ocrText.isAcceptableOrUnknown(data['ocr_text']!, _ocrTextMeta));
+    }
+    if (data.containsKey('image_path')) {
+      context.handle(_imagePathMeta,
+          imagePath.isAcceptableOrUnknown(data['image_path']!, _imagePathMeta));
     }
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
@@ -283,6 +294,8 @@ class $ClipboardItemsTable extends ClipboardItems
           .read(DriftSqlType.string, data['${effectivePrefix}metadata']),
       ocrText: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}ocr_text']),
+      imagePath: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}image_path']),
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
@@ -325,6 +338,7 @@ class ClipboardItem extends DataClass implements Insertable<ClipboardItem> {
   final ClipType type;
   final String? metadata;
   final String? ocrText;
+  final String? imagePath;
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime lastCopiedAt;
@@ -344,6 +358,7 @@ class ClipboardItem extends DataClass implements Insertable<ClipboardItem> {
       required this.type,
       this.metadata,
       this.ocrText,
+      this.imagePath,
       required this.createdAt,
       required this.updatedAt,
       required this.lastCopiedAt,
@@ -371,6 +386,9 @@ class ClipboardItem extends DataClass implements Insertable<ClipboardItem> {
     }
     if (!nullToAbsent || ocrText != null) {
       map['ocr_text'] = Variable<String>(ocrText);
+    }
+    if (!nullToAbsent || imagePath != null) {
+      map['image_path'] = Variable<String>(imagePath);
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -405,6 +423,9 @@ class ClipboardItem extends DataClass implements Insertable<ClipboardItem> {
       ocrText: ocrText == null && nullToAbsent
           ? const Value.absent()
           : Value(ocrText),
+      imagePath: imagePath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(imagePath),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       lastCopiedAt: Value(lastCopiedAt),
@@ -435,6 +456,7 @@ class ClipboardItem extends DataClass implements Insertable<ClipboardItem> {
           .fromJson(serializer.fromJson<int>(json['type'])),
       metadata: serializer.fromJson<String?>(json['metadata']),
       ocrText: serializer.fromJson<String?>(json['ocrText']),
+      imagePath: serializer.fromJson<String?>(json['imagePath']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       lastCopiedAt: serializer.fromJson<DateTime>(json['lastCopiedAt']),
@@ -460,6 +482,7 @@ class ClipboardItem extends DataClass implements Insertable<ClipboardItem> {
           .toJson<int>($ClipboardItemsTable.$convertertype.toJson(type)),
       'metadata': serializer.toJson<String?>(metadata),
       'ocrText': serializer.toJson<String?>(ocrText),
+      'imagePath': serializer.toJson<String?>(imagePath),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'lastCopiedAt': serializer.toJson<DateTime>(lastCopiedAt),
@@ -482,6 +505,7 @@ class ClipboardItem extends DataClass implements Insertable<ClipboardItem> {
           ClipType? type,
           Value<String?> metadata = const Value.absent(),
           Value<String?> ocrText = const Value.absent(),
+          Value<String?> imagePath = const Value.absent(),
           DateTime? createdAt,
           DateTime? updatedAt,
           DateTime? lastCopiedAt,
@@ -501,6 +525,7 @@ class ClipboardItem extends DataClass implements Insertable<ClipboardItem> {
         type: type ?? this.type,
         metadata: metadata.present ? metadata.value : this.metadata,
         ocrText: ocrText.present ? ocrText.value : this.ocrText,
+        imagePath: imagePath.present ? imagePath.value : this.imagePath,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
         lastCopiedAt: lastCopiedAt ?? this.lastCopiedAt,
@@ -525,6 +550,7 @@ class ClipboardItem extends DataClass implements Insertable<ClipboardItem> {
       type: data.type.present ? data.type.value : this.type,
       metadata: data.metadata.present ? data.metadata.value : this.metadata,
       ocrText: data.ocrText.present ? data.ocrText.value : this.ocrText,
+      imagePath: data.imagePath.present ? data.imagePath.value : this.imagePath,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       lastCopiedAt: data.lastCopiedAt.present
@@ -552,6 +578,7 @@ class ClipboardItem extends DataClass implements Insertable<ClipboardItem> {
           ..write('type: $type, ')
           ..write('metadata: $metadata, ')
           ..write('ocrText: $ocrText, ')
+          ..write('imagePath: $imagePath, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('lastCopiedAt: $lastCopiedAt, ')
@@ -576,6 +603,7 @@ class ClipboardItem extends DataClass implements Insertable<ClipboardItem> {
       type,
       metadata,
       ocrText,
+      imagePath,
       createdAt,
       updatedAt,
       lastCopiedAt,
@@ -598,6 +626,7 @@ class ClipboardItem extends DataClass implements Insertable<ClipboardItem> {
           other.type == this.type &&
           other.metadata == this.metadata &&
           other.ocrText == this.ocrText &&
+          other.imagePath == this.imagePath &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.lastCopiedAt == this.lastCopiedAt &&
@@ -619,6 +648,7 @@ class ClipboardItemsCompanion extends UpdateCompanion<ClipboardItem> {
   final Value<ClipType> type;
   final Value<String?> metadata;
   final Value<String?> ocrText;
+  final Value<String?> imagePath;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<DateTime> lastCopiedAt;
@@ -638,6 +668,7 @@ class ClipboardItemsCompanion extends UpdateCompanion<ClipboardItem> {
     this.type = const Value.absent(),
     this.metadata = const Value.absent(),
     this.ocrText = const Value.absent(),
+    this.imagePath = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.lastCopiedAt = const Value.absent(),
@@ -658,6 +689,7 @@ class ClipboardItemsCompanion extends UpdateCompanion<ClipboardItem> {
     required ClipType type,
     this.metadata = const Value.absent(),
     this.ocrText = const Value.absent(),
+    this.imagePath = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.lastCopiedAt = const Value.absent(),
@@ -681,6 +713,7 @@ class ClipboardItemsCompanion extends UpdateCompanion<ClipboardItem> {
     Expression<int>? type,
     Expression<String>? metadata,
     Expression<String>? ocrText,
+    Expression<String>? imagePath,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<DateTime>? lastCopiedAt,
@@ -701,6 +734,7 @@ class ClipboardItemsCompanion extends UpdateCompanion<ClipboardItem> {
       if (type != null) 'type': type,
       if (metadata != null) 'metadata': metadata,
       if (ocrText != null) 'ocr_text': ocrText,
+      if (imagePath != null) 'image_path': imagePath,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (lastCopiedAt != null) 'last_copied_at': lastCopiedAt,
@@ -723,6 +757,7 @@ class ClipboardItemsCompanion extends UpdateCompanion<ClipboardItem> {
       Value<ClipType>? type,
       Value<String?>? metadata,
       Value<String?>? ocrText,
+      Value<String?>? imagePath,
       Value<DateTime>? createdAt,
       Value<DateTime>? updatedAt,
       Value<DateTime>? lastCopiedAt,
@@ -742,6 +777,7 @@ class ClipboardItemsCompanion extends UpdateCompanion<ClipboardItem> {
       type: type ?? this.type,
       metadata: metadata ?? this.metadata,
       ocrText: ocrText ?? this.ocrText,
+      imagePath: imagePath ?? this.imagePath,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       lastCopiedAt: lastCopiedAt ?? this.lastCopiedAt,
@@ -780,6 +816,9 @@ class ClipboardItemsCompanion extends UpdateCompanion<ClipboardItem> {
     }
     if (ocrText.present) {
       map['ocr_text'] = Variable<String>(ocrText.value);
+    }
+    if (imagePath.present) {
+      map['image_path'] = Variable<String>(imagePath.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
@@ -827,6 +866,7 @@ class ClipboardItemsCompanion extends UpdateCompanion<ClipboardItem> {
           ..write('type: $type, ')
           ..write('metadata: $metadata, ')
           ..write('ocrText: $ocrText, ')
+          ..write('imagePath: $imagePath, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('lastCopiedAt: $lastCopiedAt, ')
@@ -1714,6 +1754,7 @@ typedef $$ClipboardItemsTableCreateCompanionBuilder = ClipboardItemsCompanion
   required ClipType type,
   Value<String?> metadata,
   Value<String?> ocrText,
+  Value<String?> imagePath,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
   Value<DateTime> lastCopiedAt,
@@ -1735,6 +1776,7 @@ typedef $$ClipboardItemsTableUpdateCompanionBuilder = ClipboardItemsCompanion
   Value<ClipType> type,
   Value<String?> metadata,
   Value<String?> ocrText,
+  Value<String?> imagePath,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
   Value<DateTime> lastCopiedAt,
@@ -1773,6 +1815,7 @@ class $$ClipboardItemsTableTableManager extends RootTableManager<
             Value<ClipType> type = const Value.absent(),
             Value<String?> metadata = const Value.absent(),
             Value<String?> ocrText = const Value.absent(),
+            Value<String?> imagePath = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
             Value<DateTime> lastCopiedAt = const Value.absent(),
@@ -1793,6 +1836,7 @@ class $$ClipboardItemsTableTableManager extends RootTableManager<
             type: type,
             metadata: metadata,
             ocrText: ocrText,
+            imagePath: imagePath,
             createdAt: createdAt,
             updatedAt: updatedAt,
             lastCopiedAt: lastCopiedAt,
@@ -1813,6 +1857,7 @@ class $$ClipboardItemsTableTableManager extends RootTableManager<
             required ClipType type,
             Value<String?> metadata = const Value.absent(),
             Value<String?> ocrText = const Value.absent(),
+            Value<String?> imagePath = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
             Value<DateTime> lastCopiedAt = const Value.absent(),
@@ -1833,6 +1878,7 @@ class $$ClipboardItemsTableTableManager extends RootTableManager<
             type: type,
             metadata: metadata,
             ocrText: ocrText,
+            imagePath: imagePath,
             createdAt: createdAt,
             updatedAt: updatedAt,
             lastCopiedAt: lastCopiedAt,
@@ -1885,6 +1931,11 @@ class $$ClipboardItemsTableFilterComposer
 
   ColumnFilters<String> get ocrText => $state.composableBuilder(
       column: $state.table.ocrText,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get imagePath => $state.composableBuilder(
+      column: $state.table.imagePath,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
@@ -2006,6 +2057,11 @@ class $$ClipboardItemsTableOrderingComposer
 
   ColumnOrderings<String> get ocrText => $state.composableBuilder(
       column: $state.table.ocrText,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get imagePath => $state.composableBuilder(
+      column: $state.table.imagePath,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 

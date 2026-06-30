@@ -1,26 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'export_service.dart';
+part of 'home_widget_service.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$exportServiceHash() => r'e3b269bf8d613ee48bb31c1889a3159ab61f8b7c';
+String _$homeWidgetServiceHash() => r'fdee61a41a7b7e81ae1341baac781c1fc9c0118d';
 
-/// See also [ExportService].
-@ProviderFor(ExportService)
-final exportServiceProvider =
-    AutoDisposeNotifierProvider<ExportService, void>.internal(
-  ExportService.new,
-  name: r'exportServiceProvider',
+/// See also [HomeWidgetService].
+@ProviderFor(HomeWidgetService)
+final homeWidgetServiceProvider =
+    AutoDisposeNotifierProvider<HomeWidgetService, void>.internal(
+  HomeWidgetService.new,
+  name: r'homeWidgetServiceProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$exportServiceHash,
+      : _$homeWidgetServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$ExportService = AutoDisposeNotifier<void>;
+typedef _$HomeWidgetService = AutoDisposeNotifier<void>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

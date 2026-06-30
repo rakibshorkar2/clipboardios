@@ -1,26 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'export_service.dart';
+part of 'spotlight_service.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$exportServiceHash() => r'e3b269bf8d613ee48bb31c1889a3159ab61f8b7c';
+String _$spotlightServiceHash() => r'bb4ee227212ba9db7be165ddd37cfe43ce87ce98';
 
-/// See also [ExportService].
-@ProviderFor(ExportService)
-final exportServiceProvider =
-    AutoDisposeNotifierProvider<ExportService, void>.internal(
-  ExportService.new,
-  name: r'exportServiceProvider',
+/// See also [SpotlightService].
+@ProviderFor(SpotlightService)
+final spotlightServiceProvider =
+    AutoDisposeNotifierProvider<SpotlightService, void>.internal(
+  SpotlightService.new,
+  name: r'spotlightServiceProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$exportServiceHash,
+      : _$spotlightServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$ExportService = AutoDisposeNotifier<void>;
+typedef _$SpotlightService = AutoDisposeNotifier<void>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

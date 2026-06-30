@@ -6,7 +6,7 @@ part of 'search_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$searchResultsHash() => r'c19660df8e8036a773da02064bc44e06c754130c';
+String _$searchResultsHash() => r'515d58fa00357dd7fa020ae494c4c5ff2ad8919c';
 
 /// See also [searchResults].
 @ProviderFor(searchResults)
@@ -22,6 +22,21 @@ final searchResultsProvider =
 );
 
 typedef SearchResultsRef = AutoDisposeStreamProviderRef<List<ClipboardItem>>;
+String _$searchFilterHash() => r'92899299c97269bafe13ff312c6d443e23699b92';
+
+/// See also [SearchFilter].
+@ProviderFor(SearchFilter)
+final searchFilterProvider =
+    AutoDisposeNotifierProvider<SearchFilter, SearchFilters>.internal(
+  SearchFilter.new,
+  name: r'searchFilterProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$searchFilterHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$SearchFilter = AutoDisposeNotifier<SearchFilters>;
 String _$searchQueryHash() => r'286abcff51dc844febe02639bb2e883ccab22cfd';
 
 /// See also [SearchQuery].

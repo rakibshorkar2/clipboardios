@@ -4,6 +4,8 @@ import 'features/navigation/navigation_provider.dart';
 import 'theme/app_theme.dart';
 import 'services/quick_actions_service.dart';
 import 'services/link_handler_service.dart';
+import 'services/biometric_service.dart';
+import 'services/sync_service.dart';
 
 void main() {
   runApp(

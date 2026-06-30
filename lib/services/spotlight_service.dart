@@ -25,7 +25,7 @@ class SpotlightService extends _$SpotlightService {
 
   Future<void> removeItem(int id) async {
     try {
-      await FlutterCoreSpotlight.instance.deleteSearchableItemsWithIdentifiers([id.toString()]);
+      await FlutterCoreSpotlight.instance.deleteSearchableItems([id.toString()]);
     } catch (e) {
       print("Spotlight removal error: $e");
     }
