@@ -10,7 +10,7 @@ class AuthService extends _$AuthService {
 
   @override
   FutureOr<GoogleSignInAccount?> build() async {
-    _googleSignIn = GoogleSignIn.standard(
+    _googleSignIn = GoogleSignIn(
       scopes: [
         drive.DriveApi.driveAppdataScope,
       ],
