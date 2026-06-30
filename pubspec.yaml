@@ -57,7 +57,7 @@ dependencies:
   cached_network_image: ^3.3.1
   pasteboard: ^0.2.0
   file_picker: ^8.0.0+1
-  flutter_core_spotlight: ^0.0.1
+  flutter_core_spotlight: ^1.0.4
   flutter_local_notifications: ^17.1.0
   live_activities: ^2.0.2
   app_links: ^6.0.1
@@ -66,6 +66,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.13.1
   
   # Code Generation
   build_runner: ^2.4.9
@@ -74,9 +75,13 @@ dev_dependencies:
   freezed: ^2.5.2
   json_serializable: ^6.8.0
 
+flutter_launcher_icons:
+  android: false
+  ios: true
+  image_path: "assets/icon/app_icon.png"
+  remove_alpha_ios: true
+
 flutter:
   uses-material-design: true
-  
-  # Enable assets for icons and images if needed later
-  # assets:
-  #   - assets/images/
+  assets:
+    - assets/icon/
